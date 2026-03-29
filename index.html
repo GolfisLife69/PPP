@@ -321,19 +321,29 @@
   }
   .btn-ghost:hover { color: var(--danger); }
 
+  .btn-reset {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-family: var(--mono);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    border: 1px solid rgba(255,107,107,0.25);
+    background: rgba(255,107,107,0.08);
+    color: var(--danger);
+    transition: all 0.15s;
+  }
+  .btn-reset:hover {
+    background: rgba(255,107,107,0.18);
+    border-color: rgba(255,107,107,0.4);
+  }
+
   .btn-export {
     background: var(--accent2);
     color: #0e0f11;
     font-weight: 500;
   }
   .btn-export:hover { background: #29b8e8; }
-
-  .actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-  }
 
   /* ── Output ── */
   #output { display: none; }
@@ -596,7 +606,10 @@
 
   <!-- Globale Einstellungen -->
   <div class="section">
-    <div class="section-title">Protokoll</div>
+    <div class="section-title" style="display:flex;justify-content:space-between;align-items:center">
+      <span>Protokoll</span>
+      <button class="btn btn-reset" onclick="resetAll()">Zurücksetzen</button>
+    </div>
     <div class="global-grid">
       <div class="field">
         <label>STARTDATUM</label>
@@ -616,11 +629,6 @@
     <div style="margin-top:12px">
       <button class="btn btn-secondary" onclick="addPeptid()">+ Peptid hinzufügen</button>
     </div>
-  </div>
-
-  <!-- Aktionen -->
-  <div class="actions">
-    <button class="btn btn-secondary" onclick="resetAll()">Zurücksetzen</button>
   </div>
 
   <!-- Output -->
