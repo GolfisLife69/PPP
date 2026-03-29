@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peptid Protokoll Planer</title>
+<style>
+  :root {
+    --bg: #0e0f11;
+    --surface: #16181c;
+    --surface2: #1e2026;
+    --border: #2a2d35;
+    --accent: #7fffb2;
+    --accent2: #4fd1ff;
+    --warn: #ffb84f;
+    --danger: #ff6b6b;
+    --text: #e8eaf0;
+    --text2: #8b90a0;
+    --mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Segoe UI Mono', 'Menlo', 'Consolas', monospace;
+    --sans: system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+  }
+
+  header {
+    max-width: 860px;
+    margin: 0 auto 32px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
+  }
+
+  header h1 {
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+  }
+
+  header p {
+    color: var(--text2);
+    font-size: 12px;
+    margin-top: 4px;
+  }
+
+  .main { max-width: 860px; margin: 0 auto; }
+
+  /* ── Section ── */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text2);
+    margin-bottom: 16px;
+  }
+
+  /* ── Global settings ── */
+  .global-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  /* ── Peptid card ── */
+  .peptid-list { display: flex; flex-direction: column; gap: 12px; }
+
+  .peptid-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    position: relative;
+  }
+
+  .peptid-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+
+  .peptid-name-input {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    padding: 2px 4px;
+    width: 200px;
+    outline: none;
+  }
+
+  .peptid-name-input:focus { border-color: var(--accent); }
+
+  .remove-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 11px;
+    padding: 3px 8px;
+    transition: all 0.15s;
+  }
+  .remove-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+  .peptid-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  /* ── Days selector ── */
+  .days-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .day-btn {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text2);
+    font-size: 11px;
+    font-family: var(--mono);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .day-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #0e0f11;
+    font-weight: 500;
+  }
+
+  .time-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .time-btn {
+    padding: 5px 12px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text2);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .time-btn.active {
+    background: var(--accent2);
+    border-color: var(--accent2);
+    color: #0e0f11;
+    font-weight: 500;
+  }
+
+  .type-row { display: flex; gap: 6px; margin-bottom: 14px; }
+
+  .type-btn {
+    padding: 5px 12px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text2);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .type-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #0e0f11;
+    font-weight: 500;
+  }
+
+  .injection-only { }
+  .peptid-card.oral .injection-only { display: none; }
+
+  .oral-only { display: none; }
+  .peptid-card.oral .oral-only { display: grid; }
+
+  /* ── Phases ── */
+  .phases-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .phases-label {
+    font-size: 11px;
+    color: var(--text2);
+    font-family: var(--mono);
+    letter-spacing: 0.06em;
+  }
+
+  .phases-list { display: flex; flex-direction: column; gap: 6px; }
+
+  .phase-row {
+    display: grid;
+    grid-template-columns: 28px 80px 1fr 80px 28px;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .phase-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text2);
+    text-align: center;
+    padding-top: 16px;
+  }
+
+  /* ── Calc badge ── */
+  .calc-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    background: rgba(127,255,178,0.07);
+    border: 1px solid rgba(127,255,178,0.2);
+    border-radius: 4px;
+    padding: 3px 7px;
+    white-space: nowrap;
+  }
+
+  .calc-badge.warn { color: var(--warn); background: rgba(255,184,79,0.07); border-color: rgba(255,184,79,0.2); }
+  .calc-badge.ok { color: var(--accent); }
+
+  .p-tablet-dose {
+    color: var(--accent) !important;
+    background: rgba(127,255,178,0.07) !important;
+    border-color: rgba(127,255,178,0.2) !important;
+  }
+  .p-tablet-dose:focus {
+    border-color: var(--accent) !important;
+  }
+
+  /* ── Inputs ── */
+  input[type="text"], input[type="number"], input[type="date"], select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 6px 8px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input:focus, select:focus { border-color: var(--accent2); }
+
+  label {
+    display: block;
+    font-size: 10px;
+    color: var(--text2);
+    margin-bottom: 4px;
+    letter-spacing: 0.06em;
+    font-family: var(--mono);
+  }
+
+  /* ── Buttons ── */
+  .btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: var(--mono);
+    cursor: pointer;
+    transition: all 0.15s;
+    border: none;
+    font-weight: 500;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #0e0f11;
+  }
+  .btn-primary:hover { background: #5fe898; }
+
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text2);
+  }
+  .btn-secondary:hover { border-color: var(--text2); color: var(--text); }
+
+  .btn-ghost {
+    background: none;
+    border: none;
+    color: var(--text2);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 2px 6px;
+  }
+  .btn-ghost:hover { color: var(--danger); }
+
+  .btn-export {
+    background: var(--accent2);
+    color: #0e0f11;
+    font-weight: 500;
+  }
+  .btn-export:hover { background: #29b8e8; }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  /* ── Output ── */
+  #output { display: none; }
+
+  .output-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .output-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text2);
+    margin-bottom: 16px;
+  }
+
+  /* ── Rekon table ── */
+  .rekon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .rekon-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 12px;
+  }
+
+  .rekon-name {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .rekon-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    margin-bottom: 3px;
+    color: var(--text2);
+  }
+
+  .rekon-row span:last-child {
+    font-family: var(--mono);
+    color: var(--text);
+  }
+
+  /* ── Week table ── */
+  .week-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    margin-bottom: 16px;
+  }
+
+  .week-table th {
+    text-align: left;
+    padding: 6px 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--text2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .week-table td {
+    padding: 5px 8px;
+    border-bottom: 1px solid rgba(42,45,53,0.5);
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+
+  .week-table tr:hover td { background: var(--surface2); }
+
+  .tag-day { color: var(--text2); }
+  .tag-dose { color: var(--accent); }
+  .tag-pause { color: var(--border); }
+  .tag-last { color: var(--warn); }
+
+  .week-header {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent2);
+    padding: 10px 0 4px;
+    letter-spacing: 0.06em;
+  }
+
+  .week-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .phase-change td {
+    border-top: 2px solid var(--accent2) !important;
+  }
+
+  .phase-warn {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--warn);
+    background: rgba(255,184,79,0.07);
+    border: 1px solid rgba(255,184,79,0.2);
+    border-radius: 4px;
+    padding: 3px 7px;
+    white-space: nowrap;
+  }
+
+  .phase-info {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text2);
+    padding: 3px 7px;
+    white-space: nowrap;
+  }
+
+  /* ── Summary ── */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 8px;
+  }
+
+  .summary-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 10px 12px;
+  }
+
+  .summary-peptid { font-family: var(--mono); font-size: 11px; color: var(--accent); margin-bottom: 6px; }
+  .summary-row { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px; color: var(--text2); }
+  .summary-row span:last-child { font-family: var(--mono); color: var(--text); }
+
+  /* ── Export bar ── */
+  .export-bar {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .export-label { font-size: 11px; color: var(--text2); font-family: var(--mono); }
+
+  /* ── Inline field group ── */
+  .field { }
+  .field-inline { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+
+  .status-ok { color: var(--accent); font-size: 10px; font-family: var(--mono); }
+  .status-warn { color: var(--warn); font-size: 10px; font-family: var(--mono); }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+  /* ── Syringe visual ── */
+  .syringe-wrap {
+    margin-top: 14px;
+    padding: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+  }
+
+  .syringe-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text2);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+
+  .syringe-phases { display: flex; flex-direction: column; gap: 8px; }
+
+  .syringe-phase-row { display: flex; flex-direction: column; gap: 3px; }
+
+  .syringe-phase-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text2);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .syringe-phase-label span:last-child { color: var(--accent); }
+
+  .syringe-body {
+    position: relative;
+    height: 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .syringe-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent) 0%, var(--accent2) 100%);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    min-width: 2px;
+  }
+
+  .syringe-fill.overfill { background: linear-gradient(90deg, var(--warn), var(--danger)); }
+
+  .syringe-ticks {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    pointer-events: none;
+  }
+
+  .syringe-tick {
+    flex: 1;
+    border-right: 1px solid rgba(255,255,255,0.08);
+    height: 100%;
+  }
+
+  .syringe-tick:last-child { border-right: none; }
+
+  .syringe-tick.major { border-right-color: rgba(255,255,255,0.18); }
+
+  .syringe-scale {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--border);
+    margin-top: 2px;
+    padding: 0 1px;
+  }
+
+  @media (max-width: 600px) {
+    .peptid-grid { grid-template-columns: 1fr 1fr; }
+    .phase-row { grid-template-columns: 24px 70px 1fr 70px 28px; }
+    .global-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>// PEPTID PROTOKOLL PLANER</h1>
+  <p>Rekonstitution · Dosierung · Wochenplan · ICS-Export &nbsp;
+    <span id="saveStatus" style="font-family:var(--mono);font-size:10px;color:var(--accent);opacity:0;transition:opacity 0.4s"></span>
+  </p>
+</header>
+
+<div class="main">
+
+  <!-- Globale Einstellungen -->
+  <div class="section">
+    <div class="section-title">Protokoll</div>
+    <div class="global-grid">
+      <div class="field">
+        <label>STARTDATUM</label>
+        <input type="date" id="startDate">
+      </div>
+      <div class="field">
+        <label>GESAMTWOCHEN</label>
+        <input type="number" id="totalWeeks" value="6" min="1" max="52" style="max-width:120px">
+      </div>
+    </div>
+  </div>
+
+  <!-- Peptide -->
+  <div class="section">
+    <div class="section-title">Peptide</div>
+    <div class="peptid-list" id="peptidList"></div>
+    <div style="margin-top:12px">
+      <button class="btn btn-secondary" onclick="addPeptid()">+ Peptid hinzufügen</button>
+    </div>
+  </div>
+
+  <!-- Aktionen -->
+  <div class="actions">
+    <button class="btn btn-secondary" onclick="resetAll()">Zurücksetzen</button>
+  </div>
+
+  <!-- Output -->
+  <div id="output">
+
+    <div class="output-section" id="rekonSection">
+      <div class="output-title">Rekonstitution</div>
+      <div class="rekon-grid" id="rekonGrid"></div>
+    </div>
+
+    <div class="output-section">
+      <div class="output-title">Verbrauch &amp; Spritzen</div>
+      <div class="summary-grid" id="summaryGrid"></div>
+    </div>
+
+    <div class="output-section">
+      <div class="output-title">Wochenplan</div>
+      <div id="weekPlan"></div>
+    </div>
+
+    <div class="output-section">
+      <div class="output-title">Export</div>
+      <div class="export-bar">
+        <span class="export-label">STARTZEIT MORGENS</span>
+        <input type="number" id="morningHour" value="8" min="0" max="23" style="width:70px">
+        <span class="export-label">ABENDS</span>
+        <input type="number" id="eveningHour" value="21" min="0" max="23" style="width:70px">
+        <button class="btn btn-export" onclick="exportICS()">📅 ICS herunterladen</button>
+        <button class="btn btn-export" style="background:var(--accent);color:#0e0f11" onclick="exportPDF()">🖨️ Kalender drucken</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────
+const DAYS = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+let peptidCounter = 0;
+
+function escapeHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ── Peptid hinzufügen ──────────────────────────────────────────────────
+function addPeptid(preset) {
+  const id = ++peptidCounter;
+  const p = preset || {
+    name: `Peptid ${id}`,
+    type: 'injection',
+    vial: 10,
+    bac: 2,
+    days: [0,1,2,3,4],
+    time: 'morgens',
+    phases: [{weeks: 2, dose: 200, unit: 'mcg'}]
+  };
+  const pType = p.type || 'injection';
+
+  const card = document.createElement('div');
+  card.className = 'peptid-card' + (pType === 'oral' ? ' oral' : '');
+  card.id = `peptid-${id}`;
+  card.dataset.id = id;
+
+  const daysHtml = DAYS.map((d,i) =>
+    `<button class="day-btn ${p.days.includes(i)?'active':''}" onclick="toggleDay(${id},${i},this)">${d}</button>`
+  ).join('');
+
+  card.innerHTML = `
+    <div class="peptid-card-header">
+      <input class="peptid-name-input" type="text" value="${escapeHtml(p.name)}" placeholder="Name">
+      <button class="remove-btn" onclick="removePeptid(${id})">entfernen</button>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <label>TYP</label>
+      <div class="type-row">
+        <button class="type-btn ${pType==='injection'?'active':''}" onclick="setType(${id},'injection',this)">💉 Injektion</button>
+        <button class="type-btn ${pType==='oral'?'active':''}" onclick="setType(${id},'oral',this)">💊 Oral</button>
+      </div>
+    </div>
+
+    <div class="peptid-grid injection-only" style="grid-template-columns:1fr 1fr 1fr 1fr">
+      <div class="field">
+        <label>VIAL (mg)</label>
+        <input type="number" class="p-vial" value="${p.vial || 10}" min="0.1" step="0.1" oninput="updateCalc(${id})">
+      </div>
+      <div class="field">
+        <label>BAC (mL)</label>
+        <input type="number" class="p-bac" value="${p.bac || 2}" min="0.1" step="0.1" oninput="updateCalc(${id})">
+      </div>
+      <div class="field">
+        <label>SPRITZE</label>
+        <select class="p-syringe" onchange="updateCalc(${id})">
+          <option value="0.3" ${(p.syringe||0.5)==0.3?'selected':''}>0,3 mL (30U)</option>
+          <option value="0.5" ${(p.syringe||0.5)==0.5?'selected':''}>0,5 mL (50U)</option>
+          <option value="1"   ${(p.syringe||0.5)==1  ?'selected':''}>1,0 mL (100U)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>KONZENTRATION</label>
+        <div class="calc-badge" id="conc-${id}">—</div>
+      </div>
+    </div>
+
+    <div class="peptid-grid oral-only" style="grid-template-columns:1fr 1fr">
+      <div class="field">
+        <label>TABLETTEN / PACKUNG</label>
+        <input type="number" class="p-pack-size" value="${p.packSize || 30}" min="1" step="1">
+      </div>
+      <div class="field">
+        <label>DOSIS / TABLETTE (mg)</label>
+        <input type="number" class="p-tablet-dose" value="${p.tabletDose || ''}" min="0" step="0.1" placeholder="z.B. 500" oninput="syncTabletDose(${id})">
+      </div>
+    </div>
+
+    <div style="margin-bottom:8px">
+      <label>WOCHENTAGE</label>
+      <div class="days-row">${daysHtml}</div>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <label>TAGESZEIT</label>
+      <div class="time-row">
+        <button class="time-btn ${p.time==='morgens'?'active':''}" onclick="setTime(${id},'morgens',this)">Morgens</button>
+        <button class="time-btn ${p.time==='abends'?'active':''}" onclick="setTime(${id},'abends',this)">Abends</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="phases-header">
+        <span class="phases-label">PHASEN <span id="phase-weeks-${id}" class="phase-info"></span></span>
+        <button class="btn btn-secondary" style="font-size:11px;padding:4px 10px" onclick="addPhase(${id})">+ Phase</button>
+      </div>
+      <div class="phases-list" id="phases-${id}"></div>
+    </div>
+
+    <div class="syringe-wrap injection-only" id="syringe-${id}">
+      <div class="syringe-title">SPRITZEN-VISUALISIERUNG</div>
+      <div class="syringe-phases" id="syringe-phases-${id}"></div>
+    </div>
+  `;
+
+  document.getElementById('peptidList').appendChild(card);
+  p.phases.forEach(ph => addPhase(id, ph));
+  updateCalc(id);
+}
+
+function removePeptid(id) {
+  const el = document.getElementById(`peptid-${id}`);
+  if (el) el.remove();
+}
+
+// ── Tage & Zeit ────────────────────────────────────────────────────────
+function toggleDay(id, dayIdx, btn) {
+  btn.classList.toggle('active');
+}
+
+function setTime(id, time, btn) {
+  const card = document.getElementById(`peptid-${id}`);
+  card.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function setType(id, type, btn) {
+  const card = document.getElementById(`peptid-${id}`);
+  const wasOral = card.classList.contains('oral');
+  const isOral = type === 'oral';
+
+  card.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  card.classList.toggle('oral', isOral);
+
+  // Convert units when switching type
+  if (wasOral !== isOral) {
+    card.querySelectorAll('.phase-row').forEach(row => {
+      const doseInput = row.querySelector('.ph-dose');
+      const unitSelect = row.querySelector('.ph-unit');
+      const dose = parseFloat(doseInput.value) || 0;
+      const unit = unitSelect.value;
+
+      if (isOral && unit === 'mcg') {
+        // mcg → mg
+        doseInput.value = +(dose / 1000).toPrecision(6);
+        unitSelect.value = 'mg';
+      } else if (!isOral && unit === 'mg') {
+        // mg → mcg
+        doseInput.value = +(dose * 1000).toPrecision(6);
+        unitSelect.value = 'mcg';
+      }
+    });
+    updateCalc(id);
+  }
+}
+
+function syncTabletDose(id) {
+  const card = document.getElementById(`peptid-${id}`);
+  if (!card) return;
+  const dose = parseFloat(card.querySelector('.p-tablet-dose')?.value) || 0;
+  if (dose <= 0) return;
+  card.querySelectorAll('.phase-row').forEach(row => {
+    row.querySelector('.ph-dose').value = dose;
+    row.querySelector('.ph-unit').value = 'mg';
+  });
+  updateCalc(id);
+}
+
+// ── Phasen ─────────────────────────────────────────────────────────────
+function addPhase(id, preset) {
+  const list = document.getElementById(`phases-${id}`);
+  // Default dose: use tablet dose if oral, otherwise generic
+  let ph = preset;
+  if (!ph) {
+    const card = document.getElementById(`peptid-${id}`);
+    const isOral = card?.classList.contains('oral');
+    const tabletDose = parseFloat(card?.querySelector('.p-tablet-dose')?.value) || 0;
+    if (isOral && tabletDose > 0) {
+      ph = { weeks: 2, dose: tabletDose, unit: 'mg' };
+    } else {
+      ph = { weeks: 2, dose: 400, unit: 'mcg' };
+    }
+  }
+  const row = document.createElement('div');
+  row.className = 'phase-row';
+  const phaseIdx = list.querySelectorAll('.phase-row').length + 1;
+  row.innerHTML = `
+    <div class="phase-num">${phaseIdx}</div>
+    <div class="field">
+      <label>WOCHEN</label>
+      <input type="number" class="ph-weeks" value="${ph.weeks}" min="1" oninput="updateCalc(${id})">
+    </div>
+    <div class="field">
+      <label>DOSIS</label>
+      <input type="number" class="ph-dose" value="${ph.dose}" min="0" step="0.1" oninput="updateCalc(${id})">
+    </div>
+    <div class="field">
+      <label>EINHEIT</label>
+      <select class="ph-unit" onchange="updateCalc(${id})">
+        <option value="mcg" ${ph.unit==='mcg'?'selected':''}>mcg</option>
+        <option value="mg" ${ph.unit==='mg'?'selected':''}>mg</option>
+      </select>
+    </div>
+    <button class="btn-ghost" onclick="removePhase(${id}, this)">✕</button>
+  `;
+  list.appendChild(row);
+  updateCalc(id);
+}
+
+function removePhase(id, btn) {
+  const list = document.getElementById(`phases-${id}`);
+  if (list.querySelectorAll('.phase-row').length <= 1) return;
+  btn.parentElement.remove();
+  // Renumber phases
+  list.querySelectorAll('.phase-row').forEach((row, i) => {
+    row.querySelector('.phase-num').textContent = i + 1;
+  });
+  updateCalc(id);
+}
+
+// ── Kalkulation je Peptid ──────────────────────────────────────────────
+function getPeptidData(id) {
+  const card = document.getElementById(`peptid-${id}`);
+  if (!card) return null;
+  const name = card.querySelector('.peptid-name-input').value.trim();
+  const type = card.classList.contains('oral') ? 'oral' : 'injection';
+  const vial = parseFloat(card.querySelector('.p-vial').value) || 0;
+  const bac = parseFloat(card.querySelector('.p-bac').value) || 0;
+  const days = [...card.querySelectorAll('.day-btn')]
+    .map((b,i) => b.classList.contains('active') ? i : -1)
+    .filter(i => i >= 0);
+  const time = [...card.querySelectorAll('.time-btn')]
+    .find(b => b.classList.contains('active'))?.textContent?.toLowerCase() || 'morgens';
+  const phases = [...card.querySelectorAll('.phase-row')].map(row => ({
+    weeks: parseInt(row.querySelector('.ph-weeks').value) || 1,
+    dose: parseFloat(row.querySelector('.ph-dose').value) || 0,
+    unit: row.querySelector('.ph-unit').value
+  }));
+  const syringe = parseFloat(card.querySelector('.p-syringe')?.value || 0.5);
+  const packSize = parseInt(card.querySelector('.p-pack-size')?.value) || 30;
+  const tabletDose = parseFloat(card.querySelector('.p-tablet-dose')?.value) || 0;
+  return { id, name, type, vial, bac, days, time, phases, syringe, packSize, tabletDose };
+}
+
+function updateCalc(id) {
+  const d = getPeptidData(id);
+  if (!d) return;
+
+  // Phase-weeks vs total-weeks comparison
+  const totalWeeks = parseInt(document.getElementById('totalWeeks').value) || 6;
+  const phaseWeeks = d.phases.reduce((s, ph) => s + ph.weeks, 0);
+  const phWeeksEl = document.getElementById(`phase-weeks-${id}`);
+  if (phWeeksEl) {
+    if (phaseWeeks !== totalWeeks) {
+      phWeeksEl.className = 'phase-warn';
+      phWeeksEl.textContent = `⚠ ${phaseWeeks} Wo. ≠ ${totalWeeks} Wo. Protokoll`;
+    } else {
+      phWeeksEl.className = 'phase-info';
+      phWeeksEl.textContent = `${phaseWeeks} Wo.`;
+    }
+  }
+
+  // Injection-specific calculations
+  if (d.type === 'oral' || d.bac === 0) return;
+
+  const concBadge = document.getElementById(`conc-${id}`);
+  const conc = d.vial / d.bac;
+  concBadge.textContent = `${conc.toFixed(2)} mg/mL`;
+
+  // Syringe visual
+  const syringeMaxMl = d.syringe; // e.g. 0.5
+  const syringeMaxUnits = syringeMaxMl * 100; // U-100: 0.5mL = 50U
+  const tickCount = syringeMaxUnits; // one tick per unit
+
+  const container = document.getElementById(`syringe-phases-${id}`);
+  if (!container) return;
+  container.innerHTML = '';
+
+  // Build tick marks (major every 5 or 10 units)
+  const majorInterval = syringeMaxUnits <= 30 ? 5 : syringeMaxUnits <= 50 ? 10 : 20;
+  const ticksHtml = Array.from({length: tickCount}, (_,i) =>
+    `<div class="syringe-tick ${(i+1) % majorInterval === 0 ? 'major' : ''}"></div>`
+  ).join('');
+
+  // Scale labels
+  const scaleSteps = 5;
+  const scaleLabels = Array.from({length: scaleSteps+1}, (_,i) => {
+    const u = Math.round((syringeMaxUnits / scaleSteps) * i);
+    return `<span>${u}U</span>`;
+  }).join('');
+
+  // One bar per unique dose
+  const seen = new Set();
+  d.phases.forEach((ph, idx) => {
+    const key = `${ph.dose}${ph.unit}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+
+    const dmg = doseInMg(ph.dose, ph.unit);
+    const units = conc > 0 ? calcUnits(dmg, conc) : 0;
+    const vol = conc > 0 ? calcVol(dmg, conc) : 0;
+    const pct = Math.min((units / syringeMaxUnits) * 100, 100);
+    const overfill = units > syringeMaxUnits;
+
+    const row = document.createElement('div');
+    row.className = 'syringe-phase-row';
+    row.innerHTML = `
+      <div class="syringe-phase-label">
+        <span>Phase ${idx+1} — ${ph.dose} ${ph.unit}</span>
+        <span>${units.toFixed(1)}U · ${vol.toFixed(3)} mL${overfill ? ' ⚠ > Spritze' : ''}</span>
+      </div>
+      <div class="syringe-body">
+        <div class="syringe-fill ${overfill?'overfill':''}" style="width:${pct}%"></div>
+        <div class="syringe-ticks">${ticksHtml}</div>
+      </div>
+      <div class="syringe-scale">${scaleLabels}</div>
+    `;
+    container.appendChild(row);
+  });
+}
+
+// ── Collect all peptide data ───────────────────────────────────────────
+function getAllPeptids() {
+  return [...document.querySelectorAll('.peptid-card')]
+    .map(c => getPeptidData(parseInt(c.dataset.id)))
+    .filter(Boolean);
+}
+
+// ── Kalkulationshelfer ─────────────────────────────────────────────────
+function doseInMg(dose, unit) {
+  return unit === 'mcg' ? dose / 1000 : dose;
+}
+
+function calcUnits(doseMg, concMgPerMl) {
+  // U-100 syringe: 1 unit = 0.01 mL
+  return (doseMg / concMgPerMl) / 0.01;
+}
+
+function calcVol(doseMg, concMgPerMl) {
+  return doseMg / concMgPerMl;
+}
+
+// ── Hauptberechnung ────────────────────────────────────────────────────
+function calculate() {
+  const peptids = getAllPeptids();
+  const outputEl = document.getElementById('output');
+
+  if (!peptids.length) {
+    outputEl.style.display = 'none';
+    return;
+  }
+
+  outputEl.style.display = 'block';
+
+  // Rekonstitution (only for injections, hide section if none)
+  const rekonSection = document.getElementById('rekonSection');
+  const rekonGrid = document.getElementById('rekonGrid');
+  rekonGrid.innerHTML = '';
+  const injectionPeptids = peptids.filter(p => p.type !== 'oral');
+
+  if (injectionPeptids.length === 0) {
+    rekonSection.style.display = 'none';
+  } else {
+    rekonSection.style.display = '';
+    injectionPeptids.forEach(p => {
+      const conc = p.vial / p.bac;
+      const card = document.createElement('div');
+      card.className = 'rekon-card';
+      let rows = `
+        <div class="rekon-name">${escapeHtml(p.name)}</div>
+        <div class="rekon-row"><span>Vial</span><span>${p.vial} mg</span></div>
+        <div class="rekon-row"><span>BAC</span><span>${p.bac} mL</span></div>
+        <div class="rekon-row"><span>Konzentration</span><span>${conc.toFixed(3)} mg/mL</span></div>
+        <div class="rekon-row"><span>1 Unit (U-100)</span><span>${(conc*0.01*1000).toFixed(1)} mcg</span></div>
+      `;
+      const seen = new Set();
+      p.phases.forEach(ph => {
+        const key = `${ph.dose}${ph.unit}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        const dmg = doseInMg(ph.dose, ph.unit);
+        const units = calcUnits(dmg, conc);
+        const vol = calcVol(dmg, conc);
+        rows += `<div class="rekon-row"><span>${ph.dose} ${ph.unit}</span><span>${units.toFixed(1)}U / ${vol.toFixed(3)}mL</span></div>`;
+      });
+      card.innerHTML = rows;
+      rekonGrid.appendChild(card);
+    });
+  }
+
+  // Wochenplan
+  const startDate = new Date(document.getElementById('startDate').value);
+  const totalWeeks = parseInt(document.getElementById('totalWeeks').value) || 6;
+  const weekPlan = document.getElementById('weekPlan');
+  weekPlan.innerHTML = '';
+
+  function getDoseForWeek(p, weekNum) {
+    let w = 0;
+    for (const ph of p.phases) {
+      w += ph.weeks;
+      if (weekNum <= w) return ph;
+    }
+    return p.phases[p.phases.length - 1];
+  }
+
+  for (let wk = 1; wk <= totalWeeks; wk++) {
+    const wkTitle = document.createElement('div');
+    wkTitle.className = 'week-header';
+
+    // Check if any peptide has a phase change at this week
+    const isPhaseChange = wk > 1 && peptids.some(p => {
+      const prevPh = getDoseForWeek(p, wk - 1);
+      const currPh = getDoseForWeek(p, wk);
+      return prevPh !== currPh;
+    });
+
+    wkTitle.textContent = `── Woche ${wk}` + (isPhaseChange ? '  ↑ Phasenwechsel' : '');
+    if (isPhaseChange) wkTitle.style.color = 'var(--warn)';
+    weekPlan.appendChild(wkTitle);
+
+    const wrap = document.createElement('div');
+    wrap.className = 'week-table-wrap';
+
+    const table = document.createElement('table');
+    table.className = 'week-table';
+
+    const headerCols = ['Tag', ...peptids.map(p => `${p.type==='oral'?'💊':'💉'} ${escapeHtml(p.name)}`)];
+    table.innerHTML = `<thead><tr>${headerCols.map(c=>`<th>${c}</th>`).join('')}</tr></thead>`;
+    const tbody = document.createElement('tbody');
+
+    for (let dayIdx = 0; dayIdx < 7; dayIdx++) {
+      const row = document.createElement('tr');
+      let tdDay = `<td class="tag-day">${DAYS[dayIdx]}</td>`;
+      let cells = peptids.map(p => {
+        if (!p.days.includes(dayIdx)) return `<td class="tag-pause">—</td>`;
+        const ph = getDoseForWeek(p, wk);
+        if (p.type === 'oral') {
+          return `<td class="tag-dose">${ph.dose} ${ph.unit}</td>`;
+        }
+        const conc = p.vial / p.bac;
+        const dmg = doseInMg(ph.dose, ph.unit);
+        const units = calcUnits(dmg, conc).toFixed(1);
+        const vol = calcVol(dmg, conc).toFixed(3);
+        return `<td class="tag-dose">${ph.dose}${ph.unit} → <b>${units}U</b> (${vol}mL)</td>`;
+      });
+      row.innerHTML = tdDay + cells.join('');
+      tbody.appendChild(row);
+    }
+    table.appendChild(tbody);
+    wrap.appendChild(table);
+    weekPlan.appendChild(wrap);
+  }
+
+  // Verbrauch & Spritzen
+  const summaryGrid = document.getElementById('summaryGrid');
+  summaryGrid.innerHTML = '';
+  let totalSyringes = 0;
+  let totalTablets = 0;
+
+  peptids.forEach(p => {
+    let totalDoseMg = 0;
+    let count = 0;
+
+    for (let wk = 1; wk <= totalWeeks; wk++) {
+      const ph = getDoseForWeek(p, wk);
+      const dmg = doseInMg(ph.dose, ph.unit);
+      p.days.forEach(() => {
+        totalDoseMg += dmg;
+        count++;
+      });
+    }
+
+    const card = document.createElement('div');
+    card.className = 'summary-card';
+
+    if (p.type === 'oral') {
+      totalTablets += count;
+      const packsNeeded = Math.ceil(count / p.packSize);
+      const packOk = count <= p.packSize;
+      card.innerHTML = `
+        <div class="summary-peptid">💊 ${escapeHtml(p.name)}</div>
+        <div class="summary-row"><span>Einnahmen</span><span>${count}×</span></div>
+        <div class="summary-row"><span>Verbrauch</span><span>${totalDoseMg.toFixed(2)} mg</span></div>
+        <div class="summary-row"><span>Packungen (à ${p.packSize})</span><span>${packsNeeded}×</span></div>
+        <div class="summary-row"><span>Status</span><span class="${packOk?'status-ok':'status-warn'}">${packOk?'✓ 1 Packung reicht':'⚠ '+packsNeeded+' Packungen nötig'}</span></div>
+      `;
+    } else {
+      const conc = p.vial / p.bac;
+      totalSyringes += count;
+      const totalVol = totalDoseMg / conc;
+      const vialsNeeded = Math.ceil(totalDoseMg / p.vial);
+      const vialOk = vialsNeeded <= 1;
+      card.innerHTML = `
+        <div class="summary-peptid">💉 ${escapeHtml(p.name)}</div>
+        <div class="summary-row"><span>Injektionen</span><span>${count}×</span></div>
+        <div class="summary-row"><span>Verbrauch</span><span>${totalDoseMg.toFixed(2)} mg</span></div>
+        <div class="summary-row"><span>Volumen</span><span>${totalVol.toFixed(3)} mL</span></div>
+        <div class="summary-row"><span>Vials (à ${p.vial} mg)</span><span>${vialsNeeded}×</span></div>
+        <div class="summary-row"><span>Status</span><span class="${vialOk?'status-ok':'status-warn'}">${vialOk?'✓ 1 Vial reicht':'⚠ '+vialsNeeded+' Vials nötig'}</span></div>
+      `;
+    }
+    summaryGrid.appendChild(card);
+  });
+
+  // Gesamt-Spritzen
+  if (totalSyringes > 0) {
+    const syringeCard = document.createElement('div');
+    syringeCard.className = 'summary-card';
+    syringeCard.innerHTML = `
+      <div class="summary-peptid">Spritzen gesamt</div>
+      <div class="summary-row"><span>Benötigt</span><span>${totalSyringes}×</span></div>
+      <div class="summary-row"><span>Packungen à 10</span><span>${Math.ceil(totalSyringes/10)}×</span></div>
+    `;
+    summaryGrid.appendChild(syringeCard);
+  }
+}
+
+// ── ICS Export ─────────────────────────────────────────────────────────
+function exportICS() {
+  const peptids = getAllPeptids();
+  if (!peptids.length) { alert('Keine Peptide.'); return; }
+
+  const startDateVal = document.getElementById('startDate').value;
+  if (!startDateVal) { alert('Bitte Startdatum eingeben.'); return; }
+
+  const totalWeeks = parseInt(document.getElementById('totalWeeks').value) || 6;
+  const morningH = parseInt(document.getElementById('morningHour').value) || 8;
+  const eveningH = parseInt(document.getElementById('eveningHour').value) || 21;
+
+  const startDate = new Date(startDateVal + 'T00:00:00');
+
+  function getDoseForWeek(p, weekNum) {
+    let w = 0;
+    for (const ph of p.phases) {
+      w += ph.weeks;
+      if (weekNum <= w) return ph;
+    }
+    return p.phases[p.phases.length - 1];
+  }
+
+  function pad(n) { return String(n).padStart(2,'0'); }
+
+  function dtStr(date, hour, minute) {
+    return `${date.getFullYear()}${pad(date.getMonth()+1)}${pad(date.getDate())}T${pad(hour)}${pad(minute || 0)}00`;
+  }
+
+  function dtStrEnd(date, hour) {
+    // Handle hour overflow (e.g. 23 → next day 00) via Date object
+    const d = new Date(date);
+    d.setHours(hour + 1, 0, 0, 0);
+    return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}0000`;
+  }
+
+  function uid() {
+    return Math.random().toString(36).slice(2) + Date.now().toString(36);
+  }
+
+  // Group events by date+time → combine multiple peptids
+  const eventMap = {};
+
+  for (let wk = 1; wk <= totalWeeks; wk++) {
+    for (let dayIdx = 0; dayIdx < 7; dayIdx++) {
+      const dayOffset = (wk - 1) * 7 + dayIdx;
+      const date = new Date(startDate);
+      date.setDate(date.getDate() + dayOffset);
+
+      const morningPeptids = peptids.filter(p => p.days.includes(dayIdx) && p.time === 'morgens');
+      const eveningPeptids = peptids.filter(p => p.days.includes(dayIdx) && p.time === 'abends');
+
+      [['morgens', morningPeptids, morningH], ['abends', eveningPeptids, eveningH]].forEach(([slot, ps, hour]) => {
+        if (!ps.length) return;
+        const key = `${dtStr(date, hour)}`;
+        const parts = ps.map(p => {
+          const ph = getDoseForWeek(p, wk);
+          if (p.type === 'oral') {
+            return { name: p.name, type: 'oral', dose: ph.dose, unit: ph.unit };
+          }
+          const conc = p.vial / p.bac;
+          const dmg = doseInMg(ph.dose, ph.unit);
+          const units = calcUnits(dmg, conc).toFixed(1);
+          const vol = calcVol(dmg, conc).toFixed(3);
+          return { name: p.name, type: 'injection', dose: ph.dose, unit: ph.unit, units, vol };
+        });
+
+        const titleParts = parts.map(p =>
+          p.type === 'oral' ? `💊 ${p.name} ${p.dose}${p.unit}` : `💉 ${p.name} ${p.units}U`
+        );
+        const title = titleParts.join(' + ');
+        const desc = parts.map(p =>
+          p.type === 'oral'
+            ? `${p.name}: ${p.dose} ${p.unit}`
+            : `${p.name}: ${p.dose}${p.unit} → ${p.units}U (${p.vol}mL)`
+        ).join('\\n');
+
+        eventMap[key] = { date, hour, title, desc };
+      });
+    }
+  }
+
+  const lines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Peptid Planer//DE',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'X-WR-CALNAME:Peptid Protokoll',
+    'X-WR-TIMEZONE:Europe/Berlin',
+    'BEGIN:VTIMEZONE',
+    'TZID:Europe/Berlin',
+    'BEGIN:STANDARD',
+    'DTSTART:19701025T030000',
+    'RRULE:FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10',
+    'TZOFFSETFROM:+0200',
+    'TZOFFSETTO:+0100',
+    'TZNAME:CET',
+    'END:STANDARD',
+    'BEGIN:DAYLIGHT',
+    'DTSTART:19700329T020000',
+    'RRULE:FREQ=YEARLY;BYDAY=-1SU;BYMONTH=3',
+    'TZOFFSETFROM:+0100',
+    'TZOFFSETTO:+0200',
+    'TZNAME:CEST',
+    'END:DAYLIGHT',
+    'END:VTIMEZONE'
+  ];
+
+  Object.values(eventMap).forEach(ev => {
+    const start = dtStr(ev.date, ev.hour);
+    const end = dtStrEnd(ev.date, ev.hour);
+    lines.push(
+      'BEGIN:VEVENT',
+      `UID:${uid()}@peptidplaner`,
+      `DTSTART;TZID=Europe/Berlin:${start}`,
+      `DTEND;TZID=Europe/Berlin:${end}`,
+      `SUMMARY:${ev.title}`,
+      `DESCRIPTION:${ev.desc}`,
+      'END:VEVENT'
+    );
+  });
+
+  lines.push('END:VCALENDAR');
+
+  const blob = new Blob([lines.join('\r\n')], { type: 'text/calendar' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Peptid-Protokoll.ics';
+  a.click();
+}
+
+// ── PDF / Print Kalender ──────────────────────────────────────────────
+function exportPDF() {
+  const peptids = getAllPeptids();
+  if (!peptids.length) { alert('Keine Peptide.'); return; }
+
+  const startDateVal = document.getElementById('startDate').value;
+  if (!startDateVal) { alert('Bitte Startdatum eingeben.'); return; }
+
+  const totalWeeks = parseInt(document.getElementById('totalWeeks').value) || 6;
+  const startDate = new Date(startDateVal + 'T00:00:00');
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() + totalWeeks * 7 - 1);
+
+  function getDoseForWeek(p, weekNum) {
+    let w = 0;
+    for (const ph of p.phases) {
+      w += ph.weeks;
+      if (weekNum <= w) return ph;
+    }
+    return p.phases[p.phases.length - 1];
+  }
+
+  // Build event map: dateKey → [{name, label, type}]
+  const eventMap = {};
+  for (let wk = 1; wk <= totalWeeks; wk++) {
+    for (let dayIdx = 0; dayIdx < 7; dayIdx++) {
+      const dayOffset = (wk - 1) * 7 + dayIdx;
+      const date = new Date(startDate);
+      date.setDate(date.getDate() + dayOffset);
+      const key = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+
+      peptids.forEach(p => {
+        if (!p.days.includes(dayIdx)) return;
+        const ph = getDoseForWeek(p, wk);
+        let label;
+        if (p.type === 'oral') {
+          label = `💊 ${p.name} ${ph.dose}${ph.unit}`;
+        } else {
+          const conc = p.vial / p.bac;
+          const dmg = doseInMg(ph.dose, ph.unit);
+          const units = calcUnits(dmg, conc).toFixed(1);
+          label = `💉 ${p.name} ${units}U`;
+        }
+        if (!eventMap[key]) eventMap[key] = [];
+        eventMap[key].push({ label, time: p.time });
+      });
+    }
+  }
+
+  // Determine which months to render
+  const months = [];
+  let cur = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+  const lastMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+  while (cur <= lastMonth) {
+    months.push({ year: cur.getFullYear(), month: cur.getMonth() });
+    cur.setMonth(cur.getMonth() + 1);
+  }
+
+  const MNAMES = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  const DNAMES = ['Mo','Di','Mi','Do','Fr','Sa','So'];
+
+  let calHtml = '';
+  months.forEach(({ year, month }) => {
+    const first = new Date(year, month, 1);
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    // Monday=0 offset
+    let startDay = (first.getDay() + 6) % 7;
+
+    calHtml += `<div class="cal-month"><h2>${MNAMES[month]} ${year}</h2>`;
+    calHtml += '<table><thead><tr>';
+    DNAMES.forEach(d => { calHtml += `<th>${d}</th>`; });
+    calHtml += '</tr></thead><tbody><tr>';
+
+    // Empty cells before first day
+    for (let i = 0; i < startDay; i++) calHtml += '<td class="empty"></td>';
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const key = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+      const events = eventMap[key] || [];
+      const isInRange = new Date(year, month, day) >= startDate && new Date(year, month, day) <= endDate;
+
+      calHtml += `<td class="${isInRange ? 'active' : 'outside'}">`;
+      calHtml += `<div class="day-num">${day}</div>`;
+      if (events.length && isInRange) {
+        // Sort: morgens first
+        events.sort((a, b) => a.time === 'morgens' ? -1 : 1);
+        events.forEach(ev => {
+          const cls = ev.time === 'morgens' ? 'ev-morning' : 'ev-evening';
+          calHtml += `<div class="ev ${cls}">${ev.label}</div>`;
+        });
+      }
+      calHtml += '</td>';
+
+      if ((startDay + day) % 7 === 0 && day < daysInMonth) calHtml += '</tr><tr>';
+    }
+
+    // Empty cells after last day
+    const lastDayCol = (startDay + daysInMonth) % 7;
+    if (lastDayCol > 0) {
+      for (let i = lastDayCol; i < 7; i++) calHtml += '<td class="empty"></td>';
+    }
+
+    calHtml += '</tr></tbody></table></div>';
+  });
+
+  const html = `<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Peptid Protokoll – Kalender</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; font-size: 11px; padding: 16px; color: #1a1a1a; }
+  h1 { font-size: 16px; margin-bottom: 4px; }
+  .subtitle { font-size: 11px; color: #666; margin-bottom: 20px; }
+  .cal-month { margin-bottom: 24px; page-break-inside: avoid; }
+  .cal-month h2 { font-size: 14px; margin-bottom: 6px; border-bottom: 2px solid #222; padding-bottom: 3px; }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  th { background: #f0f0f0; padding: 4px 2px; text-align: center; font-size: 10px; font-weight: 600; border: 1px solid #ccc; }
+  td { border: 1px solid #ccc; padding: 3px 4px; vertical-align: top; height: 70px; font-size: 10px; }
+  td.empty { background: #fafafa; }
+  td.outside { color: #bbb; }
+  td.active { background: #fff; }
+  .day-num { font-weight: 600; font-size: 11px; margin-bottom: 2px; }
+  .ev { padding: 1px 3px; margin-bottom: 1px; border-radius: 2px; font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ev-morning { background: #e8f5e9; color: #2e7d32; }
+  .ev-evening { background: #e3f2fd; color: #1565c0; }
+  .legend { margin-bottom: 16px; font-size: 10px; display: flex; gap: 16px; }
+  .legend span { padding: 2px 6px; border-radius: 2px; }
+  @media print {
+    body { padding: 0; }
+    .no-print { display: none; }
+    .cal-month { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<h1>Peptid Protokoll</h1>
+<div class="subtitle">${startDate.toLocaleDateString('de-DE')} – ${endDate.toLocaleDateString('de-DE')} · ${totalWeeks} Wochen</div>
+<div class="legend">
+  <span class="ev ev-morning">Morgens</span>
+  <span class="ev ev-evening">Abends</span>
+</div>
+<button class="no-print" onclick="window.print()" style="margin-bottom:12px;padding:8px 16px;font-size:13px;cursor:pointer;border:1px solid #ccc;border-radius:4px;background:#f5f5f5">🖨️ Drucken / Als PDF speichern</button>
+${calHtml}
+</body>
+</html>`;
+
+  const w = window.open('', '_blank');
+  if (w) {
+    w.document.write(html);
+    w.document.close();
+  } else {
+    alert('Popup wurde blockiert. Bitte Popups für diese Seite erlauben.');
+  }
+}
+
+// ── Reset ──────────────────────────────────────────────────────────────
+function resetAll() {
+  if (!confirm('Alles zurücksetzen und gespeicherten Stand löschen?')) return;
+  document.getElementById('peptidList').innerHTML = '';
+  peptidCounter = 0;
+  localStorage.setItem('peptidPlaner', JSON.stringify({
+    startDate: '',
+    totalWeeks: 6,
+    peptids: []
+  }));
+  document.getElementById('startDate').value = '';
+  document.getElementById('totalWeeks').value = 6;
+  calculate();
+  showSaveStatus('gelöscht');
+}
+
+// ── localStorage ───────────────────────────────────────────────────────
+function saveState() {
+  const state = {
+    startDate: document.getElementById('startDate').value,
+    totalWeeks: document.getElementById('totalWeeks').value,
+    peptids: getAllPeptids()
+  };
+  localStorage.setItem('peptidPlaner', JSON.stringify(state));
+  showSaveStatus('gespeichert');
+}
+
+function showSaveStatus(msg) {
+  const el = document.getElementById('saveStatus');
+  if (!el) return;
+  el.textContent = '● ' + msg;
+  el.style.opacity = '1';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.style.opacity = '0'; }, 2000);
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem('peptidPlaner');
+    if (!raw) return false; // first visit ever → show defaults
+    const state = JSON.parse(raw);
+    if (state.startDate) document.getElementById('startDate').value = state.startDate;
+    if (state.totalWeeks) document.getElementById('totalWeeks').value = state.totalWeeks;
+    // key exists → user has been here before (even if peptids is empty after reset)
+    if (state.peptids?.length) {
+      state.peptids.forEach(p => addPeptid(p));
+    }
+    return true;
+  } catch(e) {
+    console.warn('peptidPlaner: loadState failed', e);
+  }
+  return false;
+}
+
+// Auto-save and auto-calculate on any input change
+let _calcTimer;
+function autoCalc() {
+  clearTimeout(_calcTimer);
+  _calcTimer = setTimeout(() => {
+    // Update phase-weeks warnings for all peptids
+    document.querySelectorAll('.peptid-card').forEach(c => {
+      updateCalc(parseInt(c.dataset.id));
+    });
+    calculate();
+  }, 150);
+}
+document.addEventListener('input', () => { saveState(); autoCalc(); });
+document.addEventListener('change', () => { saveState(); autoCalc(); });
+
+// ── Init mit Beispiel-Setup ────────────────────────────────────────────
+function init() {
+  const today = new Date();
+  document.getElementById('startDate').value = today.toISOString().split('T')[0];
+
+  const loaded = loadState();
+  if (!loaded) {
+    addPeptid({
+      name: 'Retatrutide',
+      vial: 10, bac: 1,
+      syringe: 0.5,
+      days: [1],
+      time: 'morgens',
+      phases: [
+        {weeks:1, dose:1, unit:'mg'},
+        {weeks:1, dose:1.5, unit:'mg'},
+        {weeks:4, dose:1, unit:'mg'}
+      ]
+    });
+    addPeptid({
+      name: 'CJC/IPA',
+      vial: 10, bac: 2,
+      syringe: 0.5,
+      days: [0,1,2,3,4],
+      time: 'abends',
+      phases: [
+        {weeks:2, dose:200, unit:'mcg'},
+        {weeks:4, dose:400, unit:'mcg'}
+      ]
+    });
+    addPeptid({
+      name: 'GHK-Cu',
+      vial: 50, bac: 2.5,
+      syringe: 0.5,
+      days: [0,1,2,3,4],
+      time: 'morgens',
+      phases: [
+        {weeks:1, dose:1, unit:'mg'},
+        {weeks:4, dose:2, unit:'mg'}
+      ]
+    });
+  }
+  calculate();
+}
+
+init();
+</script>
+</body>
+</html>
