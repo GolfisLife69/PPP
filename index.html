@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Peptid Protokoll Planer</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230e0f11'/%3E%3Ctext x='16' y='23.5' font-family='system-ui,sans-serif' font-size='22' font-weight='700' fill='%237fffb2' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%226%22 fill=%22%230e0f11%22/%3E%3Ctext x=%2216%22 y=%2223.5%22 font-family=%22system-ui,sans-serif%22 font-size=%2222%22 font-weight=%22700%22 fill=%22%237fffb2%22 text-anchor=%22middle%22%3EP%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%226%22 fill=%22%230e0f11%22/%3E%3Ctext x=%2216%22 y=%2223.5%22 font-family=%22system-ui,sans-serif%22 font-size=%2222%22 font-weight=%22700%22 fill=%22%237fffb2%22 text-anchor=%22middle%22%3EP%3C/text%3E%3C/svg%3E">
 <style>
   :root {
     --bg: #0e0f11;
@@ -17,6 +18,7 @@
     --danger: #ff6b6b;
     --text: #e8eaf0;
     --text2: #8b90a0;
+    --input-h: 32px;
     --mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Segoe UI Mono', 'Menlo', 'Consolas', monospace;
     --sans: system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
   }
@@ -79,6 +81,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
+    align-items: end;
   }
 
   /* ── Peptid card ── */
@@ -131,6 +134,7 @@
     grid-template-columns: 1fr 1fr 1fr;
     gap: 10px;
     margin-bottom: 12px;
+    align-items: end;
   }
 
   /* ── Days selector ── */
@@ -157,6 +161,12 @@
     border-color: var(--accent);
     color: #0e0f11;
     font-weight: 500;
+  }
+  .day-btn:focus-visible,
+  .time-btn:focus-visible,
+  .type-btn:focus-visible {
+    outline: 2px solid var(--accent2);
+    outline-offset: 2px;
   }
 
   .time-row {
@@ -201,7 +211,6 @@
     font-weight: 500;
   }
 
-  .injection-only { }
   .peptid-card.oral .injection-only { display: none; }
 
   .oral-only { display: none; }
@@ -228,7 +237,7 @@
     display: grid;
     grid-template-columns: 28px 80px 1fr 80px 28px;
     gap: 6px;
-    align-items: center;
+    align-items: end;
   }
 
   .phase-num {
@@ -236,7 +245,7 @@
     font-size: 10px;
     color: var(--text2);
     text-align: center;
-    padding-top: 16px;
+    padding-bottom: 8px;
   }
 
   /* ── Calc badge ── */
@@ -246,21 +255,23 @@
     color: var(--accent);
     background: rgba(127,255,178,0.07);
     border: 1px solid rgba(127,255,178,0.2);
-    border-radius: 4px;
-    padding: 3px 7px;
+    border-radius: 5px;
+    padding: 0 8px;
+    height: var(--input-h);
+    line-height: var(--input-h);
     white-space: nowrap;
   }
 
   .calc-badge.warn { color: var(--warn); background: rgba(255,184,79,0.07); border-color: rgba(255,184,79,0.2); }
   .calc-badge.ok { color: var(--accent); }
 
-  .p-tablet-dose {
-    color: var(--accent) !important;
-    background: rgba(127,255,178,0.07) !important;
-    border-color: rgba(127,255,178,0.2) !important;
+  .peptid-card .p-tablet-dose {
+    color: var(--accent);
+    background: rgba(127,255,178,0.07);
+    border-color: rgba(127,255,178,0.2);
   }
-  .p-tablet-dose:focus {
-    border-color: var(--accent) !important;
+  .peptid-card .p-tablet-dose:focus {
+    border-color: var(--accent);
   }
 
   /* ── Inputs ── */
@@ -271,7 +282,9 @@
     color: var(--text);
     font-family: var(--mono);
     font-size: 12px;
-    padding: 6px 8px;
+    padding: 0 8px;
+    height: var(--input-h);
+    line-height: var(--input-h);
     width: 100%;
     outline: none;
     transition: border-color 0.15s;
@@ -285,6 +298,8 @@
     margin-bottom: 4px;
     letter-spacing: 0.06em;
     font-family: var(--mono);
+    line-height: 14px;
+    min-height: 14px;
   }
 
   /* ── Buttons ── */
@@ -447,7 +462,7 @@
   }
 
   .phase-change td {
-    border-top: 2px solid var(--accent2) !important;
+    border-top: 2px solid var(--accent2);
   }
 
   .phase-warn {
@@ -502,7 +517,6 @@
   .export-label { font-size: 11px; color: var(--text2); font-family: var(--mono); }
 
   /* ── Inline field group ── */
-  .field { }
   .field-inline { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
 
   .status-ok { color: var(--accent); font-size: 10px; font-family: var(--mono); }
@@ -618,7 +632,7 @@
       </div>
       <div class="field">
         <label>GESAMTWOCHEN</label>
-        <input type="number" id="totalWeeks" value="6" min="1" max="52" style="max-width:120px">
+        <input type="number" id="totalWeeks" value="6" min="1" max="52">
       </div>
     </div>
   </div>
@@ -658,7 +672,7 @@
         <span class="export-label">ABENDS</span>
         <input type="number" id="eveningHour" value="21" min="0" max="23" style="width:70px">
         <button class="btn btn-export" onclick="exportICS()">📅 ICS herunterladen</button>
-        <button class="btn btn-export" style="background:var(--accent);color:#0e0f11" onclick="exportPDF()">🖨️ Kalender drucken</button>
+        <button class="btn btn-export" style="background:var(--accent);color:#0e0f11" onclick="printCalendar()">🖨️ Kalender drucken</button>
       </div>
     </div>
 
@@ -675,6 +689,119 @@ function escapeHtml(s) {
   d.textContent = s;
   return d.innerHTML;
 }
+
+// ── Shared helper: dose for a given week (single definition) ──────────
+function getDoseForWeek(p, weekNum) {
+  let w = 0;
+  for (const ph of p.phases) {
+    w += ph.weeks;
+    if (weekNum <= w) return ph;
+  }
+  return p.phases[p.phases.length - 1];
+}
+
+// ── Event delegation on peptid list ───────────────────────────────────
+const peptidListEl = document.getElementById('peptidList');
+
+peptidListEl.addEventListener('click', function(e) {
+  const btn = e.target.closest('[data-action]');
+  if (!btn) return;
+  const action = btn.dataset.action;
+  const card = btn.closest('.peptid-card');
+  const id = card ? parseInt(card.dataset.id) : 0;
+
+  switch (action) {
+    case 'toggle-day': {
+      btn.classList.toggle('active');
+      btn.setAttribute('aria-pressed', btn.classList.contains('active'));
+      break;
+    }
+    case 'set-time': {
+      card.querySelectorAll('.time-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
+      break;
+    }
+    case 'set-type': {
+      const type = btn.dataset.type;
+      const wasOral = card.classList.contains('oral');
+      const isOral = type === 'oral';
+      card.querySelectorAll('.type-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
+      card.classList.toggle('oral', isOral);
+      if (wasOral !== isOral) {
+        card.querySelectorAll('.phase-row').forEach(row => {
+          const doseInput = row.querySelector('.ph-dose');
+          const unitSelect = row.querySelector('.ph-unit');
+          const dose = parseFloat(doseInput.value) || 0;
+          const unit = unitSelect.value;
+          if (isOral && unit === 'mcg') {
+            doseInput.value = +(dose / 1000).toPrecision(6);
+            unitSelect.value = 'mg';
+          } else if (!isOral && unit === 'mg') {
+            doseInput.value = +(dose * 1000).toPrecision(6);
+            unitSelect.value = 'mcg';
+          }
+        });
+        updateCalc(id);
+      }
+      break;
+    }
+    case 'remove-peptid': {
+      const el = document.getElementById(`peptid-${id}`);
+      if (el) el.remove();
+      calculate();
+      saveState();
+      break;
+    }
+    case 'add-phase': {
+      addPhase(id);
+      break;
+    }
+    case 'remove-phase': {
+      const list = document.getElementById(`phases-${id}`);
+      if (list.querySelectorAll('.phase-row').length <= 1) return;
+      btn.closest('.phase-row').remove();
+      list.querySelectorAll('.phase-row').forEach((row, i) => {
+        row.querySelector('.phase-num').textContent = i + 1;
+      });
+      updateCalc(id);
+      break;
+    }
+  }
+});
+
+// Keyboard support for toggle buttons
+peptidListEl.addEventListener('keydown', function(e) {
+  const btn = e.target.closest('[data-action]');
+  if (!btn) return;
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    btn.click();
+  }
+});
+
+// Sync tablet dose on input
+peptidListEl.addEventListener('input', function(e) {
+  if (!e.target.classList.contains('p-tablet-dose')) return;
+  const card = e.target.closest('.peptid-card');
+  if (!card) return;
+  const id = parseInt(card.dataset.id);
+  const dose = parseFloat(e.target.value) || 0;
+  if (dose <= 0) return;
+  card.querySelectorAll('.phase-row').forEach(row => {
+    row.querySelector('.ph-dose').value = dose;
+    row.querySelector('.ph-unit').value = 'mg';
+  });
+  updateCalc(id);
+});
 
 // ── Peptid hinzufügen ──────────────────────────────────────────────────
 function addPeptid(preset) {
@@ -696,35 +823,35 @@ function addPeptid(preset) {
   card.dataset.id = id;
 
   const daysHtml = DAYS.map((d,i) =>
-    `<button class="day-btn ${p.days.includes(i)?'active':''}" onclick="toggleDay(${id},${i},this)">${d}</button>`
+    `<button class="day-btn ${p.days.includes(i)?'active':''}" data-action="toggle-day" data-day="${i}" role="button" tabindex="0" aria-label="${d}" aria-pressed="${p.days.includes(i)}">${d}</button>`
   ).join('');
 
   card.innerHTML = `
     <div class="peptid-card-header">
-      <input class="peptid-name-input" type="text" value="${escapeHtml(p.name)}" placeholder="Name">
-      <button class="remove-btn" onclick="removePeptid(${id})">entfernen</button>
+      <input class="peptid-name-input" type="text" value="${escapeHtml(p.name)}" placeholder="Name" aria-label="Peptidname">
+      <button class="remove-btn" data-action="remove-peptid" aria-label="Peptid entfernen">entfernen</button>
     </div>
 
     <div style="margin-bottom:12px">
       <label>TYP</label>
       <div class="type-row">
-        <button class="type-btn ${pType==='injection'?'active':''}" onclick="setType(${id},'injection',this)">💉 Injektion</button>
-        <button class="type-btn ${pType==='oral'?'active':''}" onclick="setType(${id},'oral',this)">💊 Oral</button>
+        <button class="type-btn ${pType==='injection'?'active':''}" data-action="set-type" data-type="injection" role="button" tabindex="0" aria-pressed="${pType==='injection'}">💉 Injektion</button>
+        <button class="type-btn ${pType==='oral'?'active':''}" data-action="set-type" data-type="oral" role="button" tabindex="0" aria-pressed="${pType==='oral'}">💊 Oral</button>
       </div>
     </div>
 
     <div class="peptid-grid injection-only" style="grid-template-columns:1fr 1fr 1fr 1fr">
       <div class="field">
         <label>VIAL (mg)</label>
-        <input type="number" class="p-vial" value="${p.vial || 10}" min="0.1" step="0.1" oninput="updateCalc(${id})">
+        <input type="number" class="p-vial" value="${p.vial || 10}" min="0.1" step="0.1">
       </div>
       <div class="field">
         <label>BAC (mL)</label>
-        <input type="number" class="p-bac" value="${p.bac || 2}" min="0.1" step="0.1" oninput="updateCalc(${id})">
+        <input type="number" class="p-bac" value="${p.bac || 2}" min="0.1" step="0.1">
       </div>
       <div class="field">
         <label>SPRITZE</label>
-        <select class="p-syringe" onchange="updateCalc(${id})">
+        <select class="p-syringe">
           <option value="0.3" ${(p.syringe||0.5)==0.3?'selected':''}>0,3 mL (30U)</option>
           <option value="0.5" ${(p.syringe||0.5)==0.5?'selected':''}>0,5 mL (50U)</option>
           <option value="1"   ${(p.syringe||0.5)==1  ?'selected':''}>1,0 mL (100U)</option>
@@ -743,7 +870,7 @@ function addPeptid(preset) {
       </div>
       <div class="field">
         <label>DOSIS / TABLETTE (mg)</label>
-        <input type="number" class="p-tablet-dose" value="${p.tabletDose || ''}" min="0" step="0.1" placeholder="z.B. 500" oninput="syncTabletDose(${id})">
+        <input type="number" class="p-tablet-dose" value="${p.tabletDose || ''}" min="0" step="0.1" placeholder="z.B. 500">
       </div>
     </div>
 
@@ -755,15 +882,15 @@ function addPeptid(preset) {
     <div style="margin-bottom:12px">
       <label>TAGESZEIT</label>
       <div class="time-row">
-        <button class="time-btn ${p.time==='morgens'?'active':''}" onclick="setTime(${id},'morgens',this)">Morgens</button>
-        <button class="time-btn ${p.time==='abends'?'active':''}" onclick="setTime(${id},'abends',this)">Abends</button>
+        <button class="time-btn ${p.time==='morgens'?'active':''}" data-action="set-time" data-time="morgens" role="button" tabindex="0" aria-pressed="${p.time==='morgens'}">Morgens</button>
+        <button class="time-btn ${p.time==='abends'?'active':''}" data-action="set-time" data-time="abends" role="button" tabindex="0" aria-pressed="${p.time==='abends'}">Abends</button>
       </div>
     </div>
 
     <div>
       <div class="phases-header">
         <span class="phases-label">PHASEN <span id="phase-weeks-${id}" class="phase-info"></span></span>
-        <button class="btn btn-secondary" style="font-size:11px;padding:4px 10px" onclick="addPhase(${id})">+ Phase</button>
+        <button class="btn btn-secondary" style="font-size:11px;padding:4px 10px" data-action="add-phase">+ Phase</button>
       </div>
       <div class="phases-list" id="phases-${id}"></div>
     </div>
@@ -774,74 +901,14 @@ function addPeptid(preset) {
     </div>
   `;
 
-  document.getElementById('peptidList').appendChild(card);
+  peptidListEl.appendChild(card);
   p.phases.forEach(ph => addPhase(id, ph));
-  updateCalc(id);
-}
-
-function removePeptid(id) {
-  const el = document.getElementById(`peptid-${id}`);
-  if (el) el.remove();
-}
-
-// ── Tage & Zeit ────────────────────────────────────────────────────────
-function toggleDay(id, dayIdx, btn) {
-  btn.classList.toggle('active');
-}
-
-function setTime(id, time, btn) {
-  const card = document.getElementById(`peptid-${id}`);
-  card.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-}
-
-function setType(id, type, btn) {
-  const card = document.getElementById(`peptid-${id}`);
-  const wasOral = card.classList.contains('oral');
-  const isOral = type === 'oral';
-
-  card.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  card.classList.toggle('oral', isOral);
-
-  // Convert units when switching type
-  if (wasOral !== isOral) {
-    card.querySelectorAll('.phase-row').forEach(row => {
-      const doseInput = row.querySelector('.ph-dose');
-      const unitSelect = row.querySelector('.ph-unit');
-      const dose = parseFloat(doseInput.value) || 0;
-      const unit = unitSelect.value;
-
-      if (isOral && unit === 'mcg') {
-        // mcg → mg
-        doseInput.value = +(dose / 1000).toPrecision(6);
-        unitSelect.value = 'mg';
-      } else if (!isOral && unit === 'mg') {
-        // mg → mcg
-        doseInput.value = +(dose * 1000).toPrecision(6);
-        unitSelect.value = 'mcg';
-      }
-    });
-    updateCalc(id);
-  }
-}
-
-function syncTabletDose(id) {
-  const card = document.getElementById(`peptid-${id}`);
-  if (!card) return;
-  const dose = parseFloat(card.querySelector('.p-tablet-dose')?.value) || 0;
-  if (dose <= 0) return;
-  card.querySelectorAll('.phase-row').forEach(row => {
-    row.querySelector('.ph-dose').value = dose;
-    row.querySelector('.ph-unit').value = 'mg';
-  });
   updateCalc(id);
 }
 
 // ── Phasen ─────────────────────────────────────────────────────────────
 function addPhase(id, preset) {
   const list = document.getElementById(`phases-${id}`);
-  // Default dose: use tablet dose if oral, otherwise generic
   let ph = preset;
   if (!ph) {
     const card = document.getElementById(`peptid-${id}`);
@@ -860,33 +927,22 @@ function addPhase(id, preset) {
     <div class="phase-num">${phaseIdx}</div>
     <div class="field">
       <label>WOCHEN</label>
-      <input type="number" class="ph-weeks" value="${ph.weeks}" min="1" oninput="updateCalc(${id})">
+      <input type="number" class="ph-weeks" value="${ph.weeks}" min="1">
     </div>
     <div class="field">
       <label>DOSIS</label>
-      <input type="number" class="ph-dose" value="${ph.dose}" min="0" step="0.1" oninput="updateCalc(${id})">
+      <input type="number" class="ph-dose" value="${ph.dose}" min="0" step="0.1">
     </div>
     <div class="field">
       <label>EINHEIT</label>
-      <select class="ph-unit" onchange="updateCalc(${id})">
+      <select class="ph-unit">
         <option value="mcg" ${ph.unit==='mcg'?'selected':''}>mcg</option>
         <option value="mg" ${ph.unit==='mg'?'selected':''}>mg</option>
       </select>
     </div>
-    <button class="btn-ghost" onclick="removePhase(${id}, this)">✕</button>
+    <button class="btn-ghost" data-action="remove-phase" aria-label="Phase entfernen" style="padding-bottom:6px">✕</button>
   `;
   list.appendChild(row);
-  updateCalc(id);
-}
-
-function removePhase(id, btn) {
-  const list = document.getElementById(`phases-${id}`);
-  if (list.querySelectorAll('.phase-row').length <= 1) return;
-  btn.parentElement.remove();
-  // Renumber phases
-  list.querySelectorAll('.phase-row').forEach((row, i) => {
-    row.querySelector('.phase-num').textContent = i + 1;
-  });
   updateCalc(id);
 }
 
@@ -918,7 +974,7 @@ function updateCalc(id) {
   const d = getPeptidData(id);
   if (!d) return;
 
-  // Phase-weeks vs total-weeks comparison
+  // Phase-weeks vs total-weeks
   const totalWeeks = parseInt(document.getElementById('totalWeeks').value) || 6;
   const phaseWeeks = d.phases.reduce((s, ph) => s + ph.weeks, 0);
   const phWeeksEl = document.getElementById(`phase-weeks-${id}`);
@@ -932,7 +988,6 @@ function updateCalc(id) {
     }
   }
 
-  // Injection-specific calculations
   if (d.type === 'oral' || d.bac === 0) return;
 
   const concBadge = document.getElementById(`conc-${id}`);
@@ -940,30 +995,28 @@ function updateCalc(id) {
   concBadge.textContent = `${conc.toFixed(2)} mg/mL`;
 
   // Syringe visual
-  const syringeMaxMl = d.syringe; // e.g. 0.5
-  const syringeMaxUnits = syringeMaxMl * 100; // U-100: 0.5mL = 50U
-  const tickCount = syringeMaxUnits; // one tick per unit
+  const syringeMaxMl = d.syringe;
+  const syringeMaxUnits = syringeMaxMl * 100;
+  const tickCount = syringeMaxUnits;
 
   const container = document.getElementById(`syringe-phases-${id}`);
   if (!container) return;
   container.innerHTML = '';
 
-  // Build tick marks (major every 5 or 10 units)
   const majorInterval = syringeMaxUnits <= 30 ? 5 : syringeMaxUnits <= 50 ? 10 : 20;
   const ticksHtml = Array.from({length: tickCount}, (_,i) =>
     `<div class="syringe-tick ${(i+1) % majorInterval === 0 ? 'major' : ''}"></div>`
   ).join('');
 
-  // Scale labels
   const scaleSteps = 5;
   const scaleLabels = Array.from({length: scaleSteps+1}, (_,i) => {
     const u = Math.round((syringeMaxUnits / scaleSteps) * i);
     return `<span>${u}U</span>`;
   }).join('');
 
-  // One bar per unique dose
+  // One bar per unique dose — own display counter
   const seen = new Set();
-  d.phases.forEach((ph, idx) => {
+  d.phases.forEach((ph) => {
     const key = `${ph.dose}${ph.unit}`;
     if (seen.has(key)) return;
     seen.add(key);
@@ -978,7 +1031,7 @@ function updateCalc(id) {
     row.className = 'syringe-phase-row';
     row.innerHTML = `
       <div class="syringe-phase-label">
-        <span>Phase ${idx+1} — ${ph.dose} ${ph.unit}</span>
+        <span>${ph.dose} ${ph.unit}</span>
         <span>${units.toFixed(1)}U · ${vol.toFixed(3)} mL${overfill ? ' ⚠ > Spritze' : ''}</span>
       </div>
       <div class="syringe-body">
@@ -1004,7 +1057,6 @@ function doseInMg(dose, unit) {
 }
 
 function calcUnits(doseMg, concMgPerMl) {
-  // U-100 syringe: 1 unit = 0.01 mL
   return (doseMg / concMgPerMl) / 0.01;
 }
 
@@ -1024,7 +1076,7 @@ function calculate() {
 
   outputEl.style.display = 'block';
 
-  // Rekonstitution (only for injections, hide section if none)
+  // Rekonstitution
   const rekonSection = document.getElementById('rekonSection');
   const rekonGrid = document.getElementById('rekonGrid');
   rekonGrid.innerHTML = '';
@@ -1066,20 +1118,10 @@ function calculate() {
   const weekPlan = document.getElementById('weekPlan');
   weekPlan.innerHTML = '';
 
-  function getDoseForWeek(p, weekNum) {
-    let w = 0;
-    for (const ph of p.phases) {
-      w += ph.weeks;
-      if (weekNum <= w) return ph;
-    }
-    return p.phases[p.phases.length - 1];
-  }
-
   for (let wk = 1; wk <= totalWeeks; wk++) {
     const wkTitle = document.createElement('div');
     wkTitle.className = 'week-header';
 
-    // Check if any peptide has a phase change at this week
     const isPhaseChange = wk > 1 && peptids.some(p => {
       const prevPh = getDoseForWeek(p, wk - 1);
       const currPh = getDoseForWeek(p, wk);
@@ -1127,7 +1169,6 @@ function calculate() {
   const summaryGrid = document.getElementById('summaryGrid');
   summaryGrid.innerHTML = '';
   let totalSyringes = 0;
-  let totalTablets = 0;
 
   peptids.forEach(p => {
     let totalDoseMg = 0;
@@ -1146,7 +1187,6 @@ function calculate() {
     card.className = 'summary-card';
 
     if (p.type === 'oral') {
-      totalTablets += count;
       const packsNeeded = Math.ceil(count / p.packSize);
       const packOk = count <= p.packSize;
       card.innerHTML = `
@@ -1174,7 +1214,6 @@ function calculate() {
     summaryGrid.appendChild(card);
   });
 
-  // Gesamt-Spritzen
   if (totalSyringes > 0) {
     const syringeCard = document.createElement('div');
     syringeCard.className = 'summary-card';
@@ -1198,36 +1237,21 @@ function exportICS() {
   const totalWeeks = parseInt(document.getElementById('totalWeeks').value) || 6;
   const morningH = parseInt(document.getElementById('morningHour').value) || 8;
   const eveningH = parseInt(document.getElementById('eveningHour').value) || 21;
-
   const startDate = new Date(startDateVal + 'T00:00:00');
 
-  function getDoseForWeek(p, weekNum) {
-    let w = 0;
-    for (const ph of p.phases) {
-      w += ph.weeks;
-      if (weekNum <= w) return ph;
-    }
-    return p.phases[p.phases.length - 1];
-  }
-
   function pad(n) { return String(n).padStart(2,'0'); }
-
   function dtStr(date, hour, minute) {
     return `${date.getFullYear()}${pad(date.getMonth()+1)}${pad(date.getDate())}T${pad(hour)}${pad(minute || 0)}00`;
   }
-
   function dtStrEnd(date, hour) {
-    // Handle hour overflow (e.g. 23 → next day 00) via Date object
     const d = new Date(date);
     d.setHours(hour + 1, 0, 0, 0);
     return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}0000`;
   }
-
   function uid() {
     return Math.random().toString(36).slice(2) + Date.now().toString(36);
   }
 
-  // Group events by date+time → combine multiple peptids
   const eventMap = {};
 
   for (let wk = 1; wk <= totalWeeks; wk++) {
@@ -1319,8 +1343,8 @@ function exportICS() {
   a.click();
 }
 
-// ── PDF / Print Kalender ──────────────────────────────────────────────
-function exportPDF() {
+// ── Print Calendar ────────────────────────────────────────────────────
+function printCalendar() {
   const peptids = getAllPeptids();
   if (!peptids.length) { alert('Keine Peptide.'); return; }
 
@@ -1332,16 +1356,6 @@ function exportPDF() {
   const endDate = new Date(startDate);
   endDate.setDate(endDate.getDate() + totalWeeks * 7 - 1);
 
-  function getDoseForWeek(p, weekNum) {
-    let w = 0;
-    for (const ph of p.phases) {
-      w += ph.weeks;
-      if (weekNum <= w) return ph;
-    }
-    return p.phases[p.phases.length - 1];
-  }
-
-  // Build event map: dateKey → [{name, label, type}]
   const eventMap = {};
   for (let wk = 1; wk <= totalWeeks; wk++) {
     for (let dayIdx = 0; dayIdx < 7; dayIdx++) {
@@ -1368,7 +1382,6 @@ function exportPDF() {
     }
   }
 
-  // Determine which months to render
   const months = [];
   let cur = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
   const lastMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
@@ -1382,17 +1395,14 @@ function exportPDF() {
 
   let calHtml = '';
   months.forEach(({ year, month }) => {
-    const first = new Date(year, month, 1);
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    // Monday=0 offset
-    let startDay = (first.getDay() + 6) % 7;
+    let startDay = (new Date(year, month, 1).getDay() + 6) % 7;
 
     calHtml += `<div class="cal-month"><h2>${MNAMES[month]} ${year}</h2>`;
     calHtml += '<table><thead><tr>';
     DNAMES.forEach(d => { calHtml += `<th>${d}</th>`; });
     calHtml += '</tr></thead><tbody><tr>';
 
-    // Empty cells before first day
     for (let i = 0; i < startDay; i++) calHtml += '<td class="empty"></td>';
 
     for (let day = 1; day <= daysInMonth; day++) {
@@ -1403,7 +1413,6 @@ function exportPDF() {
       calHtml += `<td class="${isInRange ? 'active' : 'outside'}">`;
       calHtml += `<div class="day-num">${day}</div>`;
       if (events.length && isInRange) {
-        // Sort: morgens first
         events.sort((a, b) => a.time === 'morgens' ? -1 : 1);
         events.forEach(ev => {
           const cls = ev.time === 'morgens' ? 'ev-morning' : 'ev-evening';
@@ -1411,11 +1420,9 @@ function exportPDF() {
         });
       }
       calHtml += '</td>';
-
       if ((startDay + day) % 7 === 0 && day < daysInMonth) calHtml += '</tr><tr>';
     }
 
-    // Empty cells after last day
     const lastDayCol = (startDay + daysInMonth) % 7;
     if (lastDayCol > 0) {
       for (let i = lastDayCol; i < 7; i++) calHtml += '<td class="empty"></td>';
@@ -1448,6 +1455,7 @@ function exportPDF() {
   .ev-evening { background: #e3f2fd; color: #1565c0; }
   .legend { margin-bottom: 16px; font-size: 10px; display: flex; gap: 16px; }
   .legend span { padding: 2px 6px; border-radius: 2px; }
+  .print-btn { margin-bottom:12px;padding:8px 16px;font-size:13px;cursor:pointer;border:1px solid #ccc;border-radius:4px;background:#f5f5f5; }
   @media print {
     body { padding: 0; }
     .no-print { display: none; }
@@ -1462,8 +1470,9 @@ function exportPDF() {
   <span class="ev ev-morning">Morgens</span>
   <span class="ev ev-evening">Abends</span>
 </div>
-<button class="no-print" onclick="window.print()" style="margin-bottom:12px;padding:8px 16px;font-size:13px;cursor:pointer;border:1px solid #ccc;border-radius:4px;background:#f5f5f5">🖨️ Drucken / Als PDF speichern</button>
+<button class="no-print print-btn" onclick="window.print()">🖨️ Drucken / Als PDF speichern</button>
 ${calHtml}
+<script>window.addEventListener('load',function(){setTimeout(function(){window.print()},400)});<\/script>
 </body>
 </html>`;
 
@@ -1479,7 +1488,7 @@ ${calHtml}
 // ── Reset ──────────────────────────────────────────────────────────────
 function resetAll() {
   if (!confirm('Alles zurücksetzen und gespeicherten Stand löschen?')) return;
-  document.getElementById('peptidList').innerHTML = '';
+  peptidListEl.innerHTML = '';
   peptidCounter = 0;
   localStorage.setItem('peptidPlaner', JSON.stringify({
     startDate: '',
@@ -1494,13 +1503,17 @@ function resetAll() {
 
 // ── localStorage ───────────────────────────────────────────────────────
 function saveState() {
-  const state = {
-    startDate: document.getElementById('startDate').value,
-    totalWeeks: document.getElementById('totalWeeks').value,
-    peptids: getAllPeptids()
-  };
-  localStorage.setItem('peptidPlaner', JSON.stringify(state));
-  showSaveStatus('gespeichert');
+  try {
+    const state = {
+      startDate: document.getElementById('startDate').value,
+      totalWeeks: document.getElementById('totalWeeks').value,
+      peptids: getAllPeptids()
+    };
+    localStorage.setItem('peptidPlaner', JSON.stringify(state));
+    showSaveStatus('gespeichert');
+  } catch(e) {
+    console.warn('peptidPlaner: saveState failed', e);
+  }
 }
 
 function showSaveStatus(msg) {
@@ -1515,11 +1528,10 @@ function showSaveStatus(msg) {
 function loadState() {
   try {
     const raw = localStorage.getItem('peptidPlaner');
-    if (!raw) return false; // first visit ever → show defaults
+    if (!raw) return false;
     const state = JSON.parse(raw);
     if (state.startDate) document.getElementById('startDate').value = state.startDate;
     if (state.totalWeeks) document.getElementById('totalWeeks').value = state.totalWeeks;
-    // key exists → user has been here before (even if peptids is empty after reset)
     if (state.peptids?.length) {
       state.peptids.forEach(p => addPeptid(p));
     }
@@ -1530,22 +1542,23 @@ function loadState() {
   return false;
 }
 
-// Auto-save and auto-calculate on any input change
+// Auto-save and auto-calculate — scoped to .main
 let _calcTimer;
 function autoCalc() {
   clearTimeout(_calcTimer);
   _calcTimer = setTimeout(() => {
-    // Update phase-weeks warnings for all peptids
     document.querySelectorAll('.peptid-card').forEach(c => {
       updateCalc(parseInt(c.dataset.id));
     });
     calculate();
   }, 150);
 }
-document.addEventListener('input', () => { saveState(); autoCalc(); });
-document.addEventListener('change', () => { saveState(); autoCalc(); });
 
-// ── Init mit Beispiel-Setup ────────────────────────────────────────────
+const mainEl = document.querySelector('.main');
+mainEl.addEventListener('input', () => { saveState(); autoCalc(); });
+mainEl.addEventListener('change', () => { saveState(); autoCalc(); });
+
+// ── Init ──────────────────────────────────────────────────────────────
 function init() {
   const today = new Date();
   document.getElementById('startDate').value = today.toISOString().split('T')[0];
